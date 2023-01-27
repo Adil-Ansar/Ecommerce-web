@@ -114,12 +114,12 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
         .createHash("sha256")
         .update(req.params.token)
         .digest("hex");
-    
+
     const user = await User.findOne({
         resetPasswordToken,
-        resetPasswordExpire: {$gt: Date.now()}
+        resetPasswordExpire: { $gt: Date.now() }
     });
-    
+
     if (!user) {
         return next(new ErrorHandler("Reset Password Token is invalid or has been expired", 404));
     }
@@ -130,7 +130,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 
     user.password = req.body.password;
     user.resetPasswordToken = undefined;
-    user.resetPasswordExpire = undefined; 
+    user.resetPasswordExpire = undefined;
 
     await user.save();
 
@@ -138,11 +138,49 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Get User Detail
-exports.getUserDetails = catchAsyncErrors(async(req, res, next) => {
+exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findById(req.user.id);
 
     res.status(200).json({
         success: true,
         user
+    });
+});
+
+// Update User password 
+exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
+    const user = await User.findById(req.user.id).select("+password");
+
+    const isPAsswordMatched = user.comparePassword(req.body.oldPassword);
+
+    if (!isPAsswordMatched) {
+        return next(new ErrorHandler("Old password is incorrect", 400));
+    }
+
+    if (req.body.newPassword !== req.body.confirmPassword) {
+        return next(new ErrorHandler("password does not match", 400));
+    }
+
+    user.password = req.body.newPassword;
+    await user.save();
+
+    sendToken(user, 200, res);
+});
+
+// Update User profile 
+exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
+    const newUserData = {
+        name: req.body.name,
+        email: req.body.email,
+    };
+
+    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new: true,
+        runValidators: true,
+        useFindAndModify: false,
+    });
+
+    res.status(200).json({
+        success: true,
     });
 });
