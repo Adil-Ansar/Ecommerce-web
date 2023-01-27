@@ -1,5 +1,6 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const crypto = require("crypto");
 
 const sendToken = require("../utils/jwtToken");
 
@@ -68,7 +69,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
-    if (false) {
+    if (!user) {
         return next(new ErrorHandler("User not found", 404));
     }
 
@@ -81,8 +82,7 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
         "host"
     )}/api/v1/password/reset/${resetToken}`;
 
-    const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have 
-    not requested this email then, please ignore it`;
+    const message = `Your password reset token is :- \n\n ${resetPasswordUrl} \n\nIf you have not requested this email then, please ignore it`;
 
     try {
 
@@ -104,4 +104,45 @@ exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
 
         return next(new ErrorHandler(error.message, 500))
     }
+});
+
+// Reset Password
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+
+    // creating token hash
+    const resetPasswordToken = crypto
+        .createHash("sha256")
+        .update(req.params.token)
+        .digest("hex");
+    
+    const user = await User.findOne({
+        resetPasswordToken,
+        resetPasswordExpire: {$gt: Date.now()}
+    });
+    
+    if (!user) {
+        return next(new ErrorHandler("Reset Password Token is invalid or has been expired", 404));
+    }
+
+    if (req.body.password !== req.body.confirmPassword) {
+        return next(new ErrorHandler("Password does not match", 400));
+    }
+
+    user.password = req.body.password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined; 
+
+    await user.save();
+
+    sendToken(user, 200, res);
+});
+
+// Get User Detail
+exports.getUserDetails = catchAsyncErrors(async(req, res, next) => {
+    const user = await User.findById(req.user.id);
+
+    res.status(200).json({
+        success: true,
+        user
+    });
 });
