@@ -5,22 +5,27 @@ const { getAllProduct,
     updateProduct,
     deleteProduct,
     getProductDetails,
-    createProductReview } = require("../controller/productController");
+    createProductReview, 
+    getProductReviews,
+    deleteReview} = require("../controller/productController");
 
 
-const router = express.Router();
+const productRouter = express.Router();
 
-router.get("/product", getAllProduct);
+productRouter.get("/product", getAllProduct);
 
-router.post("/admin/product/new", isAuthenticatedUSer, authorizeRoles("admin"), createProduct); ``
+productRouter.post("/admin/product/new", isAuthenticatedUSer, authorizeRoles("admin"), createProduct); ``
 
-router.put("/admin/product/:id", isAuthenticatedUSer, authorizeRoles("admin"), updateProduct);
+productRouter.put("/admin/product/:id", isAuthenticatedUSer, authorizeRoles("admin"), updateProduct);
 
-router.delete("/admin/product/:id", isAuthenticatedUSer, authorizeRoles("admin"), deleteProduct);
+productRouter.delete("/admin/product/:id", isAuthenticatedUSer, authorizeRoles("admin"), deleteProduct);
 
-router.get("/product/:id", getProductDetails);
+productRouter.get("/product/:id", getProductDetails);
 
-router.put("/review", isAuthenticatedUSer, createProductReview);
+productRouter.put("/review", isAuthenticatedUSer, createProductReview);
 
+productRouter.get("/reviews", getProductReviews);
 
-module.exports = router;
+productRouter.delete("/reviews", isAuthenticatedUSer, deleteReview)
+
+module.exports = productRouter;
