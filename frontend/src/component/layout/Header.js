@@ -14,7 +14,7 @@ const options = {
     cartIcon: true,
     CartIconElement: MdAddShoppingCart,
     burgerColorHover: "#eb4034",
-    logo: { logo },
+    logo: logo,
     logoWidth: "20vmax",
     navColor1: "rgba(0,0,0,0.4)",
     logoHoverSize: "10px",
