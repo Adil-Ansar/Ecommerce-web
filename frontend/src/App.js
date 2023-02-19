@@ -3,7 +3,8 @@ import React from "react";
 import webfont from "webfontloader";
 
 import './App.css';
-import Header from "./component/layout/Header.js";
+import Header from "./component/layout/Header/Header.js";
+import Footer from "./component/layout/Footer/Footer.js";
 
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
   return (
     <Router>
       <Header />
+      <Footer/>
     </Router>
   );
 }
