@@ -38,9 +38,9 @@ const options = {
     profileIconColor: "rgba(35, 35, 35, 0.8)",
     searchIconColor: "rgba(35, 35, 35, 0.8)",
     cartIconColor: "rgba(35, 35, 35, 0.8)",
-    profileIconColorHove: "eb4034",
-    searchIconColorHover: "eb4034",
-    cartIconColorHover: "eb4034",
+    profileIconColorHove: "#eb4034",
+    searchIconColorHover: "#eb4034",
+    cartIconColorHover: "#eb4034",
     cartIconMargin: "1vmax"
 }
 const Header = () => {
